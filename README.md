@@ -1,3 +1,76 @@
+# SLCA Pairing Software
+
+The **SLCA Pairing Software** is a robust web application designed to streamline the organization of teams and players during tournaments hosted by the **Student Led Chess Association (SLCA)**. Built with modern web technologies like **Next.js** and **Prisma**, this application provides features for managing player rosters, creating match pairings, tracking results, and supporting multiple tournament formats.
+
+---
+
+## Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API Endpoints](#api-endpoints)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Overview
+
+The SLCA Pairing Software simplifies chess tournament management by automating complex processes such as player pairing, results tracking, and standings generation. It supports features like:
+
+- Dynamic team and player management
+- Round-based tournament progression (e.g., Swiss system)
+- Real-time updates on pairings and results
+- User authentication for secure tournament management
+- Modular API routes for backend operations
+
+---
+
+## Features
+
+- **Player and Team Management**:
+  - Add, update, and delete players and teams.
+  - View detailed rosters for each team.
+- **Tournament Pairings**:
+  - Generate match pairings for each round.
+  - Support for various tournament formats, including Swiss pairings.
+- **Result Tracking**:
+  - Record and update match results.
+  - Automatically update standings based on results.
+- **Authentication**:
+  - Secure login and user management using `next-auth`.
+- **Responsive Design**:
+  - Fully responsive UI for use on different devices.
+- **API Support**:
+  - Custom backend APIs to handle pairing logic, results, and database operations.
+
+---
+
+## Technologies Used
+
+The project leverages the following technologies:
+
+- **Frontend**: [Next.js](https://nextjs.org/) (React framework)
+- **Styling**: Tailwind CSS
+- **Backend**:
+  - API routes via Next.js
+  - Database ORM: Prisma
+- **Database**: (e.g., PostgreSQL or SQLite; configurable in `.env`)
+- **Authentication**: NextAuth.js
+- **Deployment**: Vercel or any Next.js-compatible platform
+- **Version Control**: Git and GitHub
+
+---
+
+## Project Structure
+
+The directory structure is organized as follows:
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started

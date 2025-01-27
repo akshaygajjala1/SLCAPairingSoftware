@@ -13,21 +13,21 @@ export default async function handler(req, res) {
 
     const user = await prisma.user.findUnique({
         where: {
-          email: session.user.email,
+            email: session.user.email,
         },
     })
-    if(req.method == "POST"){
+    if (req.method == "POST") {
 
-        
+
         console.log(req.body.roundId);
         console.log(req.body.sectionId)
 
         //the pairings are done, so let's lock it.
         const hello = await prisma.round.update({
-            where:{
+            where: {
                 id: req.body.roundId,
             },
-            data:{
+            data: {
                 locked: true
             }
         })
@@ -36,54 +36,54 @@ export default async function handler(req, res) {
 
         //load up all the match results
         const results = await prisma.match.findMany({
-            where:{
+            where: {
                 roundId: req.body.roundId
             }
         })
 
         //actually update
-        for(const result of results){
+        for (const result of results) {
             console.log("hello")
             //get the white players score
             const otherThing = await prisma.player.update({
-                where:{
+                where: {
                     id: result.whiteId
                 },
-                data:{
-                    record: {increment: result.result}
+                data: {
+                    record: { increment: result.result }
                 }
             })
             console.log(otherThing)
             //get the black players score
             const thing = await prisma.player.update({
-                where:{
+                where: {
                     id: result.blackId
                 },
-                data:{
-                    record: {increment: (10-(result.result))}
+                data: {
+                    record: { increment: (10 - (result.result)) }
                 }
             })
             console.log(thing)
         }
-        
+
 
         //let's create the next round
-         await prisma.round.create({
-             data:{
-                 num: hello.num+1,
-                 sectionId: req.body.sectionId,
-                 locked: false
-             }
-         })
-        
+        await prisma.round.create({
+            data: {
+                num: hello.num + 1,
+                sectionId: req.body.sectionId,
+                locked: false
+            }
+        })
+
 
         console.log(hello)
 
-        res.status(200).json({message: "hello how are you!"});
+        res.status(200).json({ message: "hello how are you!" });
     }
-    else{
-        
-        
-        res.status(200).json({ message: "hi, hello!"});
+    else {
+
+
+        res.status(200).json({ message: "hi, hello!" });
     }
 }

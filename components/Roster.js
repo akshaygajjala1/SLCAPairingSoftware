@@ -7,8 +7,6 @@ export default function Roster({ section }) {
   const [newSchoolName, setNewSchoolName] = useState("");
   const [addNew, setAddNew] = useState(false);
   async function fetchRoster() {
-
-
     await fetch("/api/roster?sectionId=" + section)
       .then((res) => res.json())
       .then((data) => {

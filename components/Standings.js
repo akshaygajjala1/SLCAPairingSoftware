@@ -13,7 +13,6 @@ export default function Standings({ section }) {
                 })
         }
         grabStandings()
-
     }, [])
     return (
         <table>

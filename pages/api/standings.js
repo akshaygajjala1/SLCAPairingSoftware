@@ -13,37 +13,34 @@ export default async function handler(req, res) {
 
     const user = await prisma.user.findUnique({
         where: {
-          email: session.user.email,
+            email: session.user.email,
         },
     })
-    if(req.method == "POST"){
-
-        
-        
-        res.status(200).json({message: createMany});
+    if (req.method == "POST") {
+        res.status(200).json({ message: createMany });
     }
-    else{
+    else {
         //handle getting standings
         console.log(req.query.sectionId)
 
         const standings = await prisma.player.findMany({
-            where:{
+            where: {
                 sectionId: req.query.sectionId
             },
-            orderBy:{
+            orderBy: {
                 record: "desc"
             },
-            select:{
+            select: {
                 name: true,
                 record: true,
-                school:{
-                    select:{
+                school: {
+                    select: {
                         name: true
                     }
                 }
             }
         })
-        
+
         res.status(200).json({ standings: standings });
     }
 }

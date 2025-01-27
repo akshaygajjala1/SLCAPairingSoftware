@@ -13,22 +13,22 @@ export default async function handler(req, res) {
 
     const user = await prisma.user.findUnique({
         where: {
-          email: session.user.email,
+            email: session.user.email,
         },
     })
-    if(req.method == "POST"){
+    if (req.method == "POST") {
         //Create a new round in this section
         const rounds = await prisma.round.findMany({
-            where:{
+            where: {
                 sectionId: req.body.sectionId
             }
         })
 
         //First round creation
-        if(rounds.length ==0){
+        if (rounds.length == 0) {
             console.log("Giiig")
             const round = await prisma.round.create({
-                data:{
+                data: {
                     sectionId: req.body.sectionId,
                     locked: false,
                     num: 1
@@ -36,38 +36,38 @@ export default async function handler(req, res) {
             })
         }
         //Rounds exist
-        else{
+        else {
 
-            const lastRound = rounds[rounds.length-1]
-            if(!lastRound.locked){
+            const lastRound = rounds[rounds.length - 1]
+            if (!lastRound.locked) {
                 console.log("Last round has to be locked!")
             }
-            else{
+            else {
                 console.log("Hello!")
                 const round = await prisma.round.create({
 
-                    data:{
+                    data: {
                         sectionId: req.body.sectionId,
                         locked: false,
-                        num: lastRound.num+1
+                        num: lastRound.num + 1
                     }
                 })
             }
 
         }
-        
-        res.status(200).json({message: "Hello"});
+
+        res.status(200).json({ message: "Hello" });
     }
-    else{
+    else {
         const rounds = await prisma.round.findMany({
-            where:{
+            where: {
                 sectionId: req.query.sectionId
             },
-            orderBy:{
+            orderBy: {
                 num: 'asc'
             }
         })
-        
+
         res.status(200).json({ rounds: rounds });
     }
 }

@@ -13,36 +13,37 @@ export default async function handler(req, res) {
 
     const user = await prisma.user.findUnique({
         where: {
-          email: session.user.email,
+            email: session.user.email,
         },
     })
     if (req.method == 'DELETE') {
-        console.log(Object.values(req.body)+'tournid')
+        console.log(Object.values(req.body) + 'tournid')
         const tournament = await prisma.tournament.delete({
-            where:{
-                id:req.body.tournId,
+            where: {
+                id: req.body.tournId,
             },
         })
     }
-    if(req.method == "POST"){
+    if (req.method == "POST") {
         const tournament = await prisma.tournament.create({
-            data:{
+            data: {
                 name: req.body.name,
                 userId: user.id
             }
         })
-        res.status(200).json({message: "Hello"});
+        res.status(200).json({ message: "Hello" });
     }
-    else{
+    else {
         //Get list of tourneys
         console.log(user)
         const tournaments = await prisma.tournament.findMany({
-            where:{
-                userId: user.id}
+            where: {
+                userId: user.id
             }
+        }
         );
-        
-        res.status(200).json({tournamentList: tournaments});
+
+        res.status(200).json({ tournamentList: tournaments });
     }
 
 }

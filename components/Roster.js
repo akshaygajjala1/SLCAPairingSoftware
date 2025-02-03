@@ -1,16 +1,15 @@
 import { PlusCircleIcon, CheckIcon, XMarkIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { useState, useEffect, useContext } from "react";
-import { matchSaved, checkMatchSaved } from './Pairing'
+import { useState, useEffect } from "react";
+import { matchSaved } from './Pairing'
 
 export default function Roster({ section }) {
   const [roster, setRoster] = useState();
   const [newSchoolName, setNewSchoolName] = useState("");
   const [addNew, setAddNew] = useState(false);
   async function fetchRoster() {
-    await fetch("/api/roster?sectionId=" + section)
+    await fetch(`/api/roster?sectionId=${section}`)
       .then((res) => res.json())
       .then((data) => {
-
         setRoster(data.roster)
       })
   }
@@ -73,7 +72,6 @@ export default function Roster({ section }) {
     const [newStudentName, setNewStudentName] = useState("")
     return (
       <div>
-
         <h1 style={{ display: "inline" }} className='font-bold '>{schoolPack[0].name}</h1>
         <TrashIcon style={{ width: 18, height: 18, display: "inline", marginLeft: 10, marginBottom: 5, color: "red" }} onClick={() => {
           console.log('schoool', schoolPack[0].name)

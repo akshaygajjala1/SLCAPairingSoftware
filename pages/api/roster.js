@@ -18,16 +18,6 @@ export default async function handler(req, res) {
     }
 
     if (req.method == "POST") {
-        if (req.body.fideID) {
-            const fidePlayer = await getFIDEPlayer(fideID);
-            if (fidePlayer) {
-                playerData = {
-                    name: fidePlayer.name,
-                    rating: fidePlayer.history[0].classical_rating,
-                };
-            }
-        }
-
         //Handle both adding students and adding schools
         console.log(req.body.setting);
         const rounds = await prisma.round.findMany({
@@ -37,6 +27,15 @@ export default async function handler(req, res) {
         })
 
         if (req.body.setting == "student") {
+            if (req.body.fideID) {
+                const fidePlayer = await getFIDEPlayer(fideID);
+                if (fidePlayer) {
+                    playerData = {
+                        name: fidePlayer.name,
+                        rating: fidePlayer.history[0].classical_rating
+                    };
+                }
+            }
             console.log("Trello")
             //handle student addition
             await prisma.player.create({
@@ -44,13 +43,14 @@ export default async function handler(req, res) {
                     id: req.body.student + req.body.sectionId,
                     schoolId: req.body.schoolId,
                     sectionId: req.body.sectionId,
-                    name: playerData.name,
+                    name: playerData.name || req.body.student,
                     record: 5 * rounds.length,
                     rating: playerData.rating || null
                 }
             });
-
-            res.status(200).json({ player: playerData });
+            if (playerData) {
+                res.status(200).json({ player: playerData });
+            }
         } else {
             console.log("shit man");
             //handle school addition

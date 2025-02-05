@@ -52,22 +52,32 @@ export default function Roster({ section }) {
     setNewSchoolName("");
   }
 
-  async function addNewStudent(name, school) {
+  async function addNewStudent(name, school, fideID="", setNewStudentName=(_) => {}) {
     //send request with name, school, section, tourney
     await fetch("/api/roster", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ schoolId: school.id, student: name, sectionId: section, setting: "student" }),
+      body: JSON.stringify({ 
+        schoolId: school.id, 
+        student: name,
+        sectionId: section,
+        setting: "student", 
+        fideID
+      }),
     })
+    const data = await response.json();
+    if (data.player) {
+      setNewStudentName(data.player.name);
+    }
     fetchRoster();
-
   }
 
   function SchoolDisplay({ schoolPack, addNewStudent, deletePlayer }) {
-    const [addNew, setAddNew] = useState(false)
-    const [newStudentName, setNewStudentName] = useState("")
+    const [addNew, setAddNew] = useState(false);
+    const [newStudentName, setNewStudentName] = useState("");
+    const [fideID, setFideId] = useState("");
     return (
       <div>
         <h1 style={{ display: "inline" }} className='font-bold '>{schoolPack[0].name}</h1>
@@ -94,6 +104,17 @@ export default function Roster({ section }) {
                   setAddNew(false)
                 }
               }} onChange={(e) => { setNewStudentName(e.target.value) }} className="my-1 appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Player Name" />
+            
+            <input 
+              value={fideID}
+              autoFocus={true}
+              onKeyDown={(e) => {
+                if (e.code == "Enter") {
+                  addNewStudent("", schoolPack[0], fideID, setNewStudentName);
+                  setAddNew(false)
+                }
+              }} onChange={(e) => { setNewStudentName(e.target.value) }} className="my-1 appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="FIDE ID"
+            />
             <button onClick={() => {
               addNewStudent(newStudentName, schoolPack[0]);
               setNewStudentName("");

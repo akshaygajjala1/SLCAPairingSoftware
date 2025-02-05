@@ -21,7 +21,7 @@ export default function Standings({ section }) {
             School: school.name,
             Record: record / 10,
         })));
-        
+
         const blob = new Blob([csv], { type: "text/csv" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -34,8 +34,8 @@ export default function Standings({ section }) {
 
     return (
         <div>
-            <button 
-                onClick={downloadCSV} 
+            <button
+                onClick={downloadCSV}
                 className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
                 Download Standings CSV
             </button>

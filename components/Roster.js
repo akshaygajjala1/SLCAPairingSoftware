@@ -15,7 +15,6 @@ export default function Roster({ section }) {
   }
 
   useEffect(() => {
-
     fetchRoster();
   }, [section])
 
@@ -55,7 +54,6 @@ export default function Roster({ section }) {
 
   async function addNewStudent(name, school) {
     //send request with name, school, section, tourney
-
     await fetch("/api/roster", {
       method: 'POST',
       headers: {
@@ -122,6 +120,7 @@ export default function Roster({ section }) {
       </div>
     )
   }
+  
   function displayRoster() {
     return (
       <div>
@@ -182,6 +181,7 @@ export default function Roster({ section }) {
       </div>
     )
   }
+  
   return (
     (matchSaved ? (
       displayRoster()

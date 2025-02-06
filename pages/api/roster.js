@@ -26,6 +26,30 @@ export default async function handler(req, res) {
             }   
         })
 
+        if (req.body.setting === "students") {
+            try {
+                const { players, sectionId } = req.body;
+                if (!Array.isArray(players)) {
+                    return res.status(400).json({ message: "Invalid data format." });
+                }
+
+                await prisma.player.createMany({
+                    data: players.map(player => ({
+                        id: `${player.name}-${sectionId}`,
+                        name: player.name,
+                        sectionId,
+                        schoolId: player.schoolId,
+                        record: 0,
+                    })),
+                    skipDuplicates: true, // Prevent duplicate errors
+                });
+                return res.status(200).json({ message: "Players added successfully." });
+            } catch (error) {
+                console.error(error);
+                return res.status(500).json({ message: "Internal server error." });
+            }
+        }
+
         if (req.body.setting == "student") {
             if (req.body.fideID) {
                 const fidePlayer = await getFIDEPlayer(fideID);

@@ -1,11 +1,12 @@
 import { PlusCircleIcon, CheckIcon, XMarkIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/20/solid";
 import { useState, useEffect } from "react";
-import { matchSaved } from './Pairing'
 
 export default function Roster({ section }) {
   const [roster, setRoster] = useState();
   const [newSchoolName, setNewSchoolName] = useState("");
   const [addNew, setAddNew] = useState(false);
+  const [bulkFile, setBulkFile] = useState(null);
+  
   async function fetchRoster() {
     await fetch(`/api/roster?sectionId=${section}`)
       .then((res) => res.json())
@@ -141,6 +142,27 @@ export default function Roster({ section }) {
       </div>
     )
   }
+
+  const handleFileChange = (event) => {
+    setBulkFile(event.target.files[0]);
+  };
+
+  // Handle player bulk upload
+  const handleBulkUpload = async () => {
+    if (!bulkFile) return;
+
+    const formData = new FormData();
+    formData.append("file", bulkFile);
+    formData.append("sectionId", section);
+
+    await fetch("/api/bulk-upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    fetchRoster();
+    setBulkFile(null);
+  };
   
   function displayRoster() {
     return (
@@ -199,6 +221,16 @@ export default function Roster({ section }) {
             <h1>Add New School</h1>
           </div>
         )}
+        <div className="bulk-upload">
+          <input type="file" onChange={handleFileChange} />
+          <button
+            onClick={handleBulkUpload}
+            disabled={!bulkFile}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Upload Roster
+          </button>
+        </div>
       </div>
     )
   }

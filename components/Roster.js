@@ -203,11 +203,5 @@ export default function Roster({ section }) {
     )
   }
   
-  return (
-    (matchSaved ? (
-      displayRoster()
-    ) : (
-      <h1>Cannot add or delete players in the middle of a round. Save the round data before trying to add or delete players.</h1>
-    ))
-  )
+  return displayRoster()
 }

@@ -2,8 +2,8 @@ import { ArrowLeftIcon, PlusCircleIcon, CheckIcon, XMarkIcon, TrashIcon } from "
 import { useState, useEffect } from "react";
 import Select from 'react-select'
 
-
 export default function SectionSelector({ activeTourney, activeSection, setActiveSection }) {
+    // TODO: fix indentation
     const [sections, setSections] = useState();
 
     const [addNew, setAddNew] = useState(false);

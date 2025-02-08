@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 import Navigation from '../../components/navigation';
 import Pairing from '../../components/Pairing';
 import Roster from '../../components/Roster';
@@ -7,10 +7,12 @@ import Standings from '../../components/Standings';
 import TabBar from '../../components/TabBar';
 import TournamentList from '../../components/TournamentList';
 
-import { useState, useEffect } from "react";
-import Head from 'next/head'
+import { useState } from "react";
+import Head from 'next/head';
 
 const Tournament = () => {
+    // TODO: fix indentation?
+    // Also, why is the name of this file surrounded by brackets?
     const router = useRouter();
     const { tournamentId } = router.query
 
@@ -19,24 +21,28 @@ const Tournament = () => {
     const [generatedRounds, setGeneratedRounds] = useState();
 
     return (
-        <div>
+        <>
             <Head>
                 <title>SLCA - Tournament System</title>
                 <meta name="description" content="Student-Led Chess Association Tournament System" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
+            {/* This Navigation component creates links to other tabs, such as the tournaments or chapters tag. */}
             <Navigation tab="tournaments" />
 
             <div className='grid grid-cols-4 mt-4 mx-4'>
+                {/* This component shows a list of the tournaments, you can also create new tournaments. */}
                 <TournamentList active={tournamentId} />
 
-                {/* Only load when tournamentId loads */}
+                {/* Only loaded when tournamentId loads */}
                 {tournamentId &&
                     <div className={`col-span-3 px-4`} >
+                        {/* A section contains: an id, name, tournamentId, tournament, schools, players, and rounds. */}
                         <SectionSelector activeTourney={tournamentId} activeSection={selSection} setActiveSection={setSelSection} />
                         <hr className='my-2' />
 
+                        {/* Shows the roster, pairing, and standings tabs. */}
                         {selSection && <TabBar focus={focus} setFocus={setFocus} />}
                         <hr className="my-2" />
 
@@ -46,8 +52,8 @@ const Tournament = () => {
                     </div>
                 }
             </div>
-        </div>
+        </>
     )
 }
 
-export default Tournament
+export default Tournament;

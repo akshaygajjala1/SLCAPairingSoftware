@@ -1,22 +1,24 @@
 import { useState, useEffect } from "react";
-import { useRouter } from 'next/router'
 
-import { BoltIcon, CloudArrowUpIcon, HandRaisedIcon, ArrowRightCircleIcon, LockClosedIcon, TrashIcon } from "@heroicons/react/20/solid";
+import { BoltIcon, CloudArrowUpIcon, LockClosedIcon, TrashIcon } from "@heroicons/react/20/solid";
 import Select from "react-select";
 import Modal from "./modal";
+
 export let matchSaved = true;
+
+// What is the point of this function?
 export function checkMatchSaved() {
     matchSaved = false;
 }
-export default function Pairing({ section, generatedRounds, setGeneratedRounds }) {
 
+export default function Pairing({ section, generatedRounds, setGeneratedRounds }) {
+    // TODO: fix indentation?
     const [roundInfo, setRoundInfo] = useState()
     const [activeRound, setActiveRound] = useState()
     const [matchData, setMatchData] = useState([])
     const [activeRoundLocked, setActiveRoundLocked] = useState()
     const [sync, setSync] = useState([])
     const [matchesSaved, setMatchesSaved] = useState(false);
-    const router = useRouter();
 
     fetchRounds()
 
@@ -25,17 +27,17 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
         await fetch("/api/rounds?sectionId=" + section)
             .then((res) => res.json())
             .then((data) => {
-                setRoundInfo(data.rounds)
+                setRoundInfo(data.rounds);
 
-                console.log(data.rounds)
+                console.log(data.rounds);
 
                 if (data.rounds.length > 0) {
-                    console.log("data.round", data.rounds)
+                    console.log("data.round", data.rounds);
                     console.log(data.rounds.length - 2);
-                    setGeneratedRounds(data.rounds.length - 2)
+                    setGeneratedRounds(data.rounds.length - 2);
                     setActiveRoundLocked(data.rounds[data.rounds.length - 1].locked)
                     if (!activeRound) {
-                        setActiveRound(data.rounds[data.rounds.length - 1].id)
+                        setActiveRound(data.rounds[data.rounds.length - 1].id);
                     }
                 }
             })
@@ -43,24 +45,24 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
 
     //Will get the current active round match data.
     async function fetchMatchData() {
-        const res = await fetch("/api/match?roundId=" + activeRound)
-        const data = await res.json()
-        setMatchData(data.matches)
-        setSync(true)
+        const res = await fetch("/api/match?roundId=" + activeRound);
+        const data = await res.json();
+        setMatchData(data.matches);
+        setSync(true);
     }
 
     //Initial Setup, get the rounds
     useEffect(() => {
-        fetchRounds()
+        fetchRounds();
     }, [])
 
     useEffect(() => {
-        console.log(sync)
+        console.log(sync);
     }, [sync])
 
     //Whenever activeRound, fetch new Match Data.
     useEffect(() => {
-        if (activeRound) fetchMatchData()
+        if (activeRound) fetchMatchData();
     }, [activeRound])
 
     //Whenever you hit this, it will hands-down fully create a new round.
@@ -75,29 +77,27 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
         });
         const data = await res.json();
         fetchRounds();
-        setActiveRound(data.message)
+        setActiveRound(data.message);
         fetchMatchData();
-        console.log(roundInfo)
-        //setGeneratedRounds(roundInfo + 1);
-
+        console.log(roundInfo);
     }
 
     async function lockRound() {
         if (matchSaved) {
-            const res = await fetch('/api/final', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ sectionId: section, roundId: activeRound, setting: 'lock' })
-            })
-            fetchRounds()
+            // Should we delete this, we don't use the variable user again.s
+            // const res = await fetch('/api/final', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ sectionId: section, roundId: activeRound, setting: 'lock' })
+            // })
+            fetchRounds();
             //alert("Success!")
         }
         else {
-            alert('Oh no! You haven\'t saved your matches!')
+            alert('Oh no! You haven\'t saved your matches!');
         }
-
     }
 
     //Update the match data for current round in the db.
@@ -118,7 +118,6 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
         } else {
             setMatchesSaved(true);
             matchSaved = true;
-            //console.log('match data' + matchData)
             await fetch("/api/update", {
                 method: 'POST',
                 headers: {
@@ -126,7 +125,7 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
                 },
                 body: JSON.stringify({ matchData: matchData }),
             })
-            fetchRounds()
+            fetchRounds();
         }
     }
 
@@ -144,40 +143,39 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
             body: JSON.stringify({ matchData: matchData })
         })
 
-        const deletedMatches = await fetch('api/match', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ matchData: matchData })
-        });
+        // INFO: I commented but didn't delete for later use.
+        // const deletedMatches = await fetch('api/match', {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ matchData: matchData })
+        // });
 
-
-        const data = await res.json()
+        const data = await res.json();
         setGeneratedRounds(generatedRounds - 1);
-        console.log("Deleted round", data)
-        fetchMatchData()
-        fetchRounds()
-        //router.reload(window.location.pathname)
+        console.log("Deleted round", data);
+        fetchMatchData();
+        fetchRounds();
     }
 
+    // INFO: the variable target is never used.
     async function autoPair(target) {
-        console.log("Starting to autopair")
-        document.getElementById("autopairLabel").innerText = "Loading..."
+        console.log("Starting to autopair");
+        document.getElementById("autopairLabel").innerText = "Loading...";
         try {
             const res = await fetch("/api/auto?sectionId=" + section + "&roundId=" + activeRound);
             const data = await res.json();
-            console.log(data)
-            fetchMatchData()
+            console.log(data);
+            fetchMatchData();
             //alert("Successfully paired!")
         } catch {
-            alert("There was an error...")
+            alert("There was an error...");
         }
-        document.getElementById("autopairLabel").innerText = "Auto-Pair Round"
+        document.getElementById("autopairLabel").innerText = "Auto-Pair Round";
 
     }
-    useEffect(() => console.log(activeRound + " " + activeRoundLocked), [activeRoundLocked])
-
+    useEffect(() => console.log(activeRound + " " + activeRoundLocked), [activeRoundLocked]);
 
     return (
         <div>
@@ -189,17 +187,15 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
             }
             {(roundInfo && activeRound) &&
                 <div>
-
                     {/* Display the Rounds with Seperate Squares */}
-
                     <div className="flex space-x-2 items-center">
                         <p>Rounds: </p>
                         {roundInfo.map((item, index) => {
                             const bg = activeRound == item.id ? "bg-purple-600" : "bg-purple-400 hover:bg-purple-600"
                             return (
                                 <div key={index} onClick={() => {
-                                    setActiveRound(item.id)
-                                    setActiveRoundLocked(roundInfo[item.num - 1].locked)
+                                    setActiveRound(item.id);
+                                    setActiveRoundLocked(roundInfo[item.num - 1].locked);
                                 }}
                                     className={"p-1 w-10 text-white text-center items-center rounded font-bold text-xl " + bg}>
                                     {item.num}
@@ -232,7 +228,6 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
                                 <LockClosedIcon className="h-5 w-5" />
                                 <p>Lock Current Round</p>
                             </button>}
-
                         </div>
                     }
                     {(activeRoundLocked && matchData.length > 0) &&
@@ -244,7 +239,6 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
                             <p className="italic" onLoad={console.log("Latest round", roundInfo.indexOf(roundInfo.find(e => e.id == activeRound)))}>Results are final & cannot be modified.</p>
                         </div>
                     }
-
                 </div>
             }
         </div>
@@ -253,29 +247,25 @@ export default function Pairing({ section, generatedRounds, setGeneratedRounds }
 
 
 function LockedDisplayTable({ matches, section }) {
-
     const [playerDict, setPlayerDict] = useState();
 
     async function fetchPlayerNames() {
-        const res = await fetch("/api/roster?sectionId=" + section)
+        const res = await fetch("/api/roster?sectionId=" + section);
         const data = await res.json();
-        let temp = {}
+        let temp = {};
 
         //Build dictionary of student names.
         for (const school of data.roster) {
             for (const player of school[1]) {
-                const label = player.name + " (" + player.record / 10 + ") - " + school[0].name
-                temp[player.id] = label
+                const label = player.name + " (" + player.record / 10 + ") - " + school[0].name;
+                temp[player.id] = label;
             }
         }
-
-
         setPlayerDict(temp)
-
     }
 
     useEffect(() => {
-        fetchPlayerNames()
+        fetchPlayerNames();
     }, [])
 
     return (
@@ -335,22 +325,21 @@ function ManualPairingTable({ activeRound, matches, setMatches, section, setSync
     const [playerOptions, setPlayerOptions] = useState([])
 
     async function fetchData() {
-        const res = await fetch("/api/roster?sectionId=" + section)
+        const res = await fetch("/api/roster?sectionId=" + section);
         const data = await res.json();
         let temp = [];
 
         for (const school of data.roster) {
             for (const player of school[1]) {
-                const label = player.name + " (" + player.record / 10 + ") - " + school[0].name
-                temp.push({ label: label, value: player.id })
+                const label = player.name + " (" + player.record / 10 + ") - " + school[0].name;
+                temp.push({ label: label, value: player.id });
             }
         }
-
-        setPlayerOptions(temp)
+        setPlayerOptions(temp);
     }
 
     useEffect(() => {
-        fetchData()
+        fetchData();
     }, [activeRound])
 
     return (
@@ -377,10 +366,11 @@ function ManualPairingTable({ activeRound, matches, setMatches, section, setSync
 }
 
 
+// TODO: remove the variable setSync?
 function TableRow({ element, index, matches, setMatches, players, setSync }) {
 
-    const [whiteOption, setWhiteOption] = useState(null)
-    const [blackOption, setBlackOption] = useState(null)
+    const [whiteOption, setWhiteOption] = useState(null);
+    const [blackOption, setBlackOption] = useState(null);
 
     //Initialize whiteOption & BlackOption
     useEffect(() => {
@@ -393,33 +383,32 @@ function TableRow({ element, index, matches, setMatches, players, setSync }) {
         //Search the list and see if they match, set it as the correct player.
         for (const player of players) {
             //See if any intersect
-            if (element.whiteId == player.value) whiteFill = player
-            if (element.blackId == player.value) blackFill = player
+            if (element.whiteId == player.value) whiteFill = player;
+            if (element.blackId == player.value) blackFill = player;
         }
 
         setWhiteOption(whiteFill);
-        setBlackOption(blackFill)
+        setBlackOption(blackFill);
 
     }, [players, element])
-
-
 
     //Whenever whiteOption or blackOption Change, then change the corresponding match value
     //always keep them in sync
     useEffect(() => {
         if (whiteOption) {
-            let temp = matches
-            temp[index].whiteId = whiteOption.value
-            setMatches(temp)
-            console.log("mfer")
+            let temp = matches;
+            temp[index].whiteId = whiteOption.value;
+            setMatches(temp);
+            // What happened to bro?
+            console.log("mfer");
         }
     }, [whiteOption])
 
     useEffect(() => {
         if (blackOption) {
-            let temp = matches
-            temp[index].blackId = blackOption.value
-            setMatches(temp)
+            let temp = matches;
+            temp[index].blackId = blackOption.value;
+            setMatches(temp);
         }
     }, [blackOption])
 
@@ -441,17 +430,16 @@ function TableRow({ element, index, matches, setMatches, players, setSync }) {
 }
 
 function NewResultBox({ index, roundData, setRoundData }) {
-
     const [counter, setCounter] = useState(0);
 
     function updateScore(score) {
-        let temp = roundData
+        let temp = roundData;
         temp[index].result = score;
-        setRoundData(temp)
+        setRoundData(temp);
         //shit update logic
-        setCounter(counter + 1)
-
+        setCounter(counter + 1);
     }
+    
     return (
         <td className='border border-r border-2 border-black text-center '>
             <div className="flex items-center space-x-2 p-2 justify-center w-full">

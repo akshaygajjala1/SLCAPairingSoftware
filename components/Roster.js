@@ -1,24 +1,21 @@
 import { PlusCircleIcon, CheckIcon, XMarkIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/20/solid";
-import { useState, useEffect, useContext } from "react";
-import { matchSaved, checkMatchSaved } from './Pairing'
+import { useState, useEffect } from "react";
 
 export default function Roster({ section }) {
   const [roster, setRoster] = useState();
   const [newSchoolName, setNewSchoolName] = useState("");
   const [addNew, setAddNew] = useState(false);
+  const [bulkFile, setBulkFile] = useState(null);
+  
   async function fetchRoster() {
-
-
-    await fetch("/api/roster?sectionId=" + section)
+    await fetch(`/api/roster?sectionId=${section}`)
       .then((res) => res.json())
       .then((data) => {
-
         setRoster(data.roster)
       })
   }
 
   useEffect(() => {
-
     fetchRoster();
   }, [section])
 
@@ -56,26 +53,34 @@ export default function Roster({ section }) {
     setNewSchoolName("");
   }
 
-  async function addNewStudent(name, school) {
+  async function addNewStudent(name, school, fideID="", setNewStudentName=(_) => {}) {
     //send request with name, school, section, tourney
-
     await fetch("/api/roster", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ schoolId: school.id, student: name, sectionId: section, setting: "student" }),
+      body: JSON.stringify({ 
+        schoolId: school.id, 
+        student: name,
+        sectionId: section,
+        setting: "student", 
+        fideID
+      }),
     })
+    const data = await response.json();
+    if (data.player) {
+      setNewStudentName(data.player.name);
+    }
     fetchRoster();
-
   }
 
   function SchoolDisplay({ schoolPack, addNewStudent, deletePlayer }) {
-    const [addNew, setAddNew] = useState(false)
-    const [newStudentName, setNewStudentName] = useState("")
+    const [addNew, setAddNew] = useState(false);
+    const [newStudentName, setNewStudentName] = useState("");
+    const [fideID, setFideId] = useState("");
     return (
       <div>
-
         <h1 style={{ display: "inline" }} className='font-bold '>{schoolPack[0].name}</h1>
         <TrashIcon style={{ width: 18, height: 18, display: "inline", marginLeft: 10, marginBottom: 5, color: "red" }} onClick={() => {
           console.log('schoool', schoolPack[0].name)
@@ -100,6 +105,17 @@ export default function Roster({ section }) {
                   setAddNew(false)
                 }
               }} onChange={(e) => { setNewStudentName(e.target.value) }} className="my-1 appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="Player Name" />
+            
+            <input 
+              value={fideID}
+              autoFocus={true}
+              onKeyDown={(e) => {
+                if (e.code == "Enter") {
+                  addNewStudent("", schoolPack[0], fideID, setNewStudentName);
+                  setAddNew(false)
+                }
+              }} onChange={(e) => { setNewStudentName(e.target.value) }} className="my-1 appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" type="text" placeholder="FIDE ID"
+            />
             <button onClick={() => {
               addNewStudent(newStudentName, schoolPack[0]);
               setNewStudentName("");
@@ -126,6 +142,28 @@ export default function Roster({ section }) {
       </div>
     )
   }
+
+  const handleFileChange = (event) => {
+    setBulkFile(event.target.files[0]);
+  };
+
+  // Handle player bulk upload
+  const handleBulkUpload = async () => {
+    if (!bulkFile) return;
+
+    const formData = new FormData();
+    formData.append("file", bulkFile);
+    formData.append("sectionId", section);
+
+    await fetch("/api/bulk-upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    fetchRoster();
+    setBulkFile(null);
+  };
+  
   function displayRoster() {
     return (
       <div>
@@ -183,14 +221,19 @@ export default function Roster({ section }) {
             <h1>Add New School</h1>
           </div>
         )}
+        <div className="bulk-upload">
+          <input type="file" onChange={handleFileChange} />
+          <button
+            onClick={handleBulkUpload}
+            disabled={!bulkFile}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Upload Roster
+          </button>
+        </div>
       </div>
     )
   }
-  return (
-    (matchSaved ? (
-      displayRoster()
-    ) : (
-      <h1>Cannot add or delete players in the middle of a round. Save the round data before trying to add or delete players.</h1>
-    ))
-  )
+  
+  return displayRoster()
 }
